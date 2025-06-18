@@ -101,7 +101,7 @@ const lumilux: Developer = {
 
 <div align="center">
 
-![Snake eating contributions](https://raw.githubusercontent.com/Pimboto/Pimboto/output/github-contribution-grid-snake-dark.svg)
+![Snake eating contributions](https://raw.githubusercontent.com/Pimboto/Pimboto/output/brutalist-snake.svg)
 
 </div>
 

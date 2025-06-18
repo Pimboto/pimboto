@@ -50,9 +50,9 @@ const pimboto: Developer = {
 
 <div align="center">
 
-<img height="160em" src="https://github-readme-stats.vercel.app/api?username=pimbotomodel&show_icons=true&theme=dark&hide_border=true&bg_color=1a1a1a&title_color=ffffff&text_color=cccccc&icon_color=ffffff&border_radius=0"/>
+<img height="160em" src="https://github-readme-stats.vercel.app/api?username=pimboto&show_icons=true&theme=dark&hide_border=true&bg_color=1a1a1a&title_color=ffffff&text_color=cccccc&icon_color=ffffff&border_radius=0"/>
 
-<img height="160em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=pimbotomodel&layout=compact&theme=dark&hide_border=true&bg_color=1a1a1a&title_color=ffffff&text_color=cccccc&border_radius=0"/>
+<img height="160em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=pimboto&layout=compact&theme=dark&hide_border=true&bg_color=1a1a1a&title_color=ffffff&text_color=cccccc&border_radius=0"/>
 
 </div>
 

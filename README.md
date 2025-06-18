@@ -1,6 +1,6 @@
 <div align="center">
 
-![Header](https://capsule-render.vercel.app/api?type=rect&color=0x1a1a1a&fontColor=ffffff&height=180&section=header&text=LUMILUX&fontSize=70&fontAlign=50&fontAlignY=50&desc=FULLSTACK%20%7C%20BACKEND%20%7C%20AUTOMATION&descAlign=50&descAlignY=70&descSize=16)
+![Header](https://capsule-render.vercel.app/api?type=rect&color=0x1a1a1a&fontColor=ffffff&height=180&section=header&text=PIMBOTO&fontSize=70&fontAlign=50&fontAlignY=50&desc=FULLSTACK%20%7C%20BACKEND%20%7C%20AUTOMATION&descAlign=50&descAlignY=70&descSize=16)
 
 [![Typing SVG](https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=20&duration=2000&pause=1000&color=ffffff&center=true&vCenter=true&width=500&height=50&lines=JAVASCRIPT+%2B+TYPESCRIPT;NEXT.JS+%2B+BACKEND+SYSTEMS;MOBILE+AUTOMATION+ENGINEER)](https://git.io/typing-svg)
 
@@ -22,7 +22,7 @@ interface Developer {
   techStack: TechStack;
 }
 
-const lumilux: Developer = {
+const pimboto: Developer = {
   specialization: [
     "fullstack_development",
     "backend_architecture", 
@@ -40,7 +40,7 @@ const lumilux: Developer = {
 
 <div align="center">
 
-![Profile Views](https://komarev.com/ghpvc/?username=lumiluxmodel&color=1a1a1a&style=flat-square&label=VIEWS)
+![Profile Views](https://komarev.com/ghpvc/?username=pimboto&color=1a1a1a&style=flat-square&label=VIEWS)
 
 </div>
 
@@ -50,9 +50,9 @@ const lumilux: Developer = {
 
 <div align="center">
 
-<img height="160em" src="https://github-readme-stats.vercel.app/api?username=lumiluxmodel&show_icons=true&theme=dark&hide_border=true&bg_color=1a1a1a&title_color=ffffff&text_color=cccccc&icon_color=ffffff&border_radius=0"/>
+<img height="160em" src="https://github-readme-stats.vercel.app/api?username=pimboto&show_icons=true&theme=dark&hide_border=true&bg_color=1a1a1a&title_color=ffffff&text_color=cccccc&icon_color=ffffff&border_radius=0"/>
 
-<img height="160em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=lumiluxmodel&layout=compact&theme=dark&hide_border=true&bg_color=1a1a1a&title_color=ffffff&text_color=cccccc&border_radius=0"/>
+<img height="160em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=pimboto&layout=compact&theme=dark&hide_border=true&bg_color=1a1a1a&title_color=ffffff&text_color=cccccc&border_radius=0"/>
 
 </div>
 
@@ -101,7 +101,7 @@ const lumilux: Developer = {
 
 <div align="center">
 
-![GitHub Streak](https://github-readme-streak-stats.herokuapp.com/?user=lumiluxmodel&theme=dark&hide_border=true&background=1a1a1a&stroke=666666&ring=ffffff&fire=ffffff&currStreakLabel=ffffff&border_radius=0)
+![GitHub Streak](https://github-readme-streak-stats.herokuapp.com/?user=pimboto&theme=dark&hide_border=true&background=1a1a1a&stroke=666666&ring=ffffff&fire=ffffff&currStreakLabel=ffffff&border_radius=0)
 
 </div>
 
@@ -152,8 +152,8 @@ CURRENTLY_BUILDING:
 
 <div align="center">
 
-[![GitHub](https://img.shields.io/badge/GITHUB-1a1a1a?style=flat-square&logo=github&logoColor=white)](https://github.com/lumiluxmodel)
-[![Email](https://img.shields.io/badge/EMAIL-1a1a1a?style=flat-square&logo=gmail&logoColor=white)](mailto:contact@example.com)
+[![GitHub](https://img.shields.io/badge/GITHUB-1a1a1a?style=flat-square&logo=github&logoColor=white)](https://github.com/pimboto)
+[![Email](https://img.shields.io/badge/EMAIL-1a1a1a?style=flat-square&logo=gmail&logoColor=white)](mailto:pimbotoo@gmail.com.com)
 
 </div>
 

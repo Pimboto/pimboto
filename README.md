@@ -97,34 +97,6 @@ const pimboto: Developer = {
 
 ---
 
-## CONTRIBUTION.SNAKE
-
-<div align="center">
-
-![Snake eating contributions](https://raw.githubusercontent.com/Pimboto/Pimboto/output/brutalist-snake.svg)
-
-</div>
-
----
-
-## CURRENT.PROJECTS
-
-```yaml
-DEVELOPMENT_FOCUS:
-  - next_js_applications
-  - typescript_backend_systems
-  - react_native_mobile_apps
-  - ios_automation_frameworks
-
-AUTOMATION_STACK:
-  - appium_webdriver
-  - ios_testing_pipelines
-  - mobile_app_automation
-  - ui_testing_frameworks
-```
-
----
-
 ## DEV.ENVIRONMENT
 
 ```yaml

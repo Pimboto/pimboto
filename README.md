@@ -1,6 +1,6 @@
 <div align="center">
 
-![Header](https://capsule-render.vercel.app/api?type=rect&color=0x1a1a1a&fontColor=ffffff&height=180&section=header&text=LUMILUX&fontSize=70&fontAlign=50&fontAlignY=50&desc=FULLSTACK%20%7C%20BACKEND%20%7C%20AUTOMATION&descAlign=50&descAlignY=70&descSize=16)
+![Header](https://capsule-render.vercel.app/api?type=rect&color=0x1a1a1a&fontColor=ffffff&height=180&section=header&text=PIMBOTO&fontSize=70&fontAlign=50&fontAlignY=50&desc=FULLSTACK%20%7C%20BACKEND%20%7C%20AUTOMATION&descAlign=50&descAlignY=70&descSize=16)
 
 [![Typing SVG](https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=20&duration=2000&pause=1000&color=ffffff&center=true&vCenter=true&width=500&height=50&lines=JAVASCRIPT+%2B+TYPESCRIPT;NEXT.JS+%2B+BACKEND+SYSTEMS;MOBILE+AUTOMATION+ENGINEER)](https://git.io/typing-svg)
 
@@ -22,7 +22,7 @@ interface Developer {
   techStack: TechStack;
 }
 
-const lumilux: Developer = {
+const pimboto: Developer = {
   specialization: [
     "fullstack_development",
     "backend_architecture", 
@@ -50,9 +50,9 @@ const lumilux: Developer = {
 
 <div align="center">
 
-<img height="160em" src="https://github-readme-stats.vercel.app/api?username=lumiluxmodel&show_icons=true&theme=dark&hide_border=true&bg_color=1a1a1a&title_color=ffffff&text_color=cccccc&icon_color=ffffff&border_radius=0"/>
+<img height="160em" src="https://github-readme-stats.vercel.app/api?username=pimbotomodel&show_icons=true&theme=dark&hide_border=true&bg_color=1a1a1a&title_color=ffffff&text_color=cccccc&icon_color=ffffff&border_radius=0"/>
 
-<img height="160em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=lumiluxmodel&layout=compact&theme=dark&hide_border=true&bg_color=1a1a1a&title_color=ffffff&text_color=cccccc&border_radius=0"/>
+<img height="160em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=pimbotomodel&layout=compact&theme=dark&hide_border=true&bg_color=1a1a1a&title_color=ffffff&text_color=cccccc&border_radius=0"/>
 
 </div>
 

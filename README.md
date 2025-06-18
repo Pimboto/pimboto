@@ -97,11 +97,11 @@ const lumilux: Developer = {
 
 ---
 
-## CONTRIBUTION.GRAPH
+## CONTRIBUTION.SNAKE
 
 <div align="center">
 
-![GitHub Streak](https://github-readme-streak-stats.herokuapp.com/?user=Pimboto&theme=dark&hide_border=true&background=1a1a1a&stroke=666666&ring=ffffff&fire=ffffff&currStreakLabel=ffffff&border_radius=0)
+![Snake eating contributions](https://raw.githubusercontent.com/Pimboto/Pimboto/output/github-contribution-grid-snake-dark.svg)
 
 </div>
 

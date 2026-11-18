@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 232 52" width="232" height="52" role="img" aria-labelledby="t d">
+<title id="t">PIMBO.DEV</title>
+<desc id="d">PIMBO.DEV</desc>
+<style>
+
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
+<defs>
+<path id="g0" d="M50-400L50 0L100 0L100-150L250-150L250-200L100-200L100-350L250-350L250-400M250-350L250-200L300-200L300-350"/><path id="g1" d="M150-50L50-50L50 0L300 0L300-50L200-50L200-350L300-350L300-400L50-400L50-350L150-350"/><path id="g2" d="M50-400L50 0L100 0L100-250L150-250L150-300L100-300L100-400M250-250L250 0L300 0L300-400L250-400L250-300L200-300L200-250M150-250L150-150L200-150L200-250"/><path id="g3" d="M50-400L50 0L250 0L250-50L100-50L100-200L250-200L250-250L100-250L100-350L250-350L250-400M250-200L250-50L300-50L300-200M250-350L250-250L300-250L300-350"/><path id="g4" d="M50-350L50-50L100-50L100-350M100-50L100 0L250 0L250-50M250-350L250-50L300-50L300-350M100-400L100-350L250-350L250-400"/><path id="g5" d="M150-100L150 0L200 0L200-100"/><path id="g6" d="M50-400L50 0L250 0L250-50L100-50L100-350L250-350L250-400M250-350L250-50L300-50L300-350"/><path id="g7" d="M50-400L50 0L300 0L300-50L100-50L100-200L250-200L250-250L100-250L100-350L300-350L300-400"/><path id="g8" d="M150-50L150-150L100-150L100-50M150-50L150 0L200 0L200-50M50-400L50-150L100-150L100-400M250-400L250-150L300-150L300-400M200-150L200-50L250-50L250-150"/>
+<pattern id="ln" width="4" height="3" patternUnits="userSpaceOnUse"><rect width="4" height="1" fill="#000" opacity=".28"/></pattern>
+</defs>
+<rect width="232" height="52" rx="14" fill="#62f0a6"/>
+<g transform="scale(0.02545)" fill="#04110a"><use href="#g0" x="2330" y="1218"/><use href="#g1" x="2735" y="1218"/><use href="#g2" x="3140" y="1218"/><use href="#g3" x="3545" y="1218"/><use href="#g4" x="3950" y="1218"/><use href="#g5" x="4355" y="1218"/><use href="#g6" x="4760" y="1218"/><use href="#g7" x="5165" y="1218"/><use href="#g8" x="5570" y="1218"/></g>
+<path d="M160.7 31l9 -9m-7 0h7v7" fill="none" stroke="#04110a" stroke-width="1.8"/>
+<rect width="232" height="52" rx="14" fill="url(#ln)"/>
+</svg>

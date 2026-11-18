@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 232 52" width="232" height="52" role="img" aria-labelledby="t d">
+<title id="t">LET'S TALK</title>
+<desc id="d">LET'S TALK</desc>
+<style>
+
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
+<defs>
+<path id="g0" d="M50-400L50 0L300 0L300-50L100-50L100-400"/><path id="g1" d="M50-400L50 0L300 0L300-50L100-50L100-200L250-200L250-250L100-250L100-350L300-350L300-400"/><path id="g2" d="M50-400L50-350L150-350L150 0L200 0L200-350L300-350L300-400"/><path id="g3" d="M150-400L150-250L200-250L200-400"/><path id="g4" d="M50-350L50-250L100-250L100-350M100-250L100-200L250-200L250-250M250-50L100-50L100 0L250 0M100-50L100-100L50-100L50-50M250-200L250-50L300-50L300-200M100-400L100-350L250-350L250-400M250-350L250-300L300-300L300-350"/><path id="g5" d=""/><path id="g6" d="M50-300L50 0L100 0L100-150L250-150L250 0L300 0L300-300L250-300L250-200L100-200L100-300M150-400L150-350L200-350L200-400M100-350L100-300L150-300L150-350M200-350L200-300L250-300L250-350"/><path id="g7" d="M50-400L50 0L100 0L100-200L200-200L200-300L150-300L150-250L100-250L100-400M250-400L250-350L300-350L300-400M200-350L200-300L250-300L250-350M250-100L250-200L200-200L200-100M250-100L250 0L300 0L300-100"/>
+<pattern id="ln" width="4" height="3" patternUnits="userSpaceOnUse"><rect width="4" height="1" fill="#000" opacity=".28"/></pattern>
+</defs>
+<rect x="1" y="1" width="230" height="50" rx="13" fill="#060a08" stroke="#35b874" stroke-width="1.5"/>
+<g transform="scale(0.02545)" fill="#c4ffe0"><use href="#g0" x="2128" y="1218"/><use href="#g1" x="2533" y="1218"/><use href="#g2" x="2938" y="1218"/><use href="#g3" x="3343" y="1218"/><use href="#g4" x="3748" y="1218"/><use href="#g2" x="4558" y="1218"/><use href="#g6" x="4963" y="1218"/><use href="#g0" x="5368" y="1218"/><use href="#g7" x="5773" y="1218"/></g>
+<path d="M165.8 31l9 -9m-7 0h7v7" fill="none" stroke="#c4ffe0" stroke-width="1.8"/>
+<rect width="232" height="52" rx="14" fill="url(#ln)"/>
+</svg>

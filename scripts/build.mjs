@@ -9,6 +9,8 @@ const W = 880;
 const readJson = (rel) => JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8'));
 const tierOf = (v) => (v < 0.16 ? 0 : v < 0.34 ? 1 : v < 0.55 ? 2 : v < 0.78 ? 3 : 4);
 const pad2 = (i) => String(i).padStart(2, '0');
+/* times keep three decimals: rounded to a tenth, the deals of a flicker drift apart and leave holes */
+const sec = (v) => +v.toFixed(3);
 
 /* ══ channel 1: the boot screen ════════════════════════════
    The name stands on a mountain of characters: dense under the
@@ -90,14 +92,14 @@ function hero() {
   doc.style(
     /* two sets of hot cells re-deal on different clocks, so the flicker never reads as a loop */
     '.a,.b{visibility:hidden}.a0,.b0{visibility:visible}',
-    `.a{animation:sa ${n(STEP_A * 4)}s steps(1) infinite}`,
-    `.b{animation:sb ${n(STEP_B * 3)}s steps(1) infinite}`,
+    `.a{animation:sa ${sec(STEP_A * 4)}s steps(1) infinite}`,
+    `.b{animation:sb ${sec(STEP_B * 3)}s steps(1) infinite}`,
     '@keyframes sa{0%{visibility:visible}25%,100%{visibility:hidden}}',
     '@keyframes sb{0%{visibility:visible}33.3%,100%{visibility:hidden}}',
     `.p{opacity:0;animation:pu ${PULSE}s steps(1) infinite}`,
     '@keyframes pu{0%{opacity:.95}1.7%{opacity:.4}3.4%,100%{opacity:0}}',
     /* the row reaches the letters and they flare */
-    `.tg{opacity:.5;animation:tg ${PULSE}s steps(1) ${n(rows * RISE)}s infinite}`,
+    `.tg{opacity:.5;animation:tg ${PULSE}s steps(1) ${sec(rows * RISE)}s infinite}`,
     '@keyframes tg{0%{opacity:1}3%{opacity:.8}6%{opacity:.65}9%,100%{opacity:.5}}',
     /* the tear: colour fringes jump apart and the middle of the letters slips sideways */
     '.gr{animation:gr 9s steps(1) infinite}.gc{animation:gc 9s steps(1) infinite}.gm{animation:gm 9s steps(1) infinite}',
@@ -114,10 +116,10 @@ function hero() {
 
   doc.add(`<g id="mtn">${doc.field(still, { size: fs })}</g>`);
   doc.add('<use href="#mtn" filter="url(#glow)" opacity=".5"/>');
-  dealA.forEach((d, k) => doc.add(`<g class="a a${k}" style="animation-delay:${k ? n(-(4 - k) * STEP_A) : 0}s">${doc.field(d, { size: fs })}</g>`));
-  dealB.forEach((d, k) => doc.add(`<g class="b b${k}" style="animation-delay:${k ? n(-(3 - k) * STEP_B) : 0}s">${doc.field(d, { size: fs })}</g>`));
+  dealA.forEach((d, k) => doc.add(`<g class="a a${k}" style="animation-delay:${k ? sec(-(4 - k) * STEP_A) : 0}s">${doc.field(d, { size: fs })}</g>`));
+  dealB.forEach((d, k) => doc.add(`<g class="b b${k}" style="animation-delay:${k ? sec(-(3 - k) * STEP_B) : 0}s">${doc.field(d, { size: fs })}</g>`));
   pulse.forEach((cells, row) => {
-    if (cells.length) doc.add(`<g class="p" style="animation-delay:${n((rows - 1 - row) * RISE)}s">${doc.field(cells, { size: fs })}</g>`);
+    if (cells.length) doc.add(`<g class="p" style="animation-delay:${sec((rows - 1 - row) * RISE)}s">${doc.field(cells, { size: fs })}</g>`);
   });
 
   /* ── the title: glow, colour fringes, then the letters in three slices ── */
@@ -297,10 +299,10 @@ function stackPanel() {
     bulge: 20,
   });
   const { groups } = layout(doc);
-  const STEP = 0.16, period = n(count * STEP + 2.4);
+  const STEP = 0.16, period = sec(count * STEP + 2.4);
   doc.style(
     `.lit{opacity:0;animation:lit ${period}s steps(1) infinite}`,
-    `@keyframes lit{0%{opacity:1}${n((STEP * 100) / period)}%{opacity:.45}${n((STEP * 200) / period)}%,100%{opacity:0}}`,
+    `@keyframes lit{0%{opacity:1}${sec((STEP * 100) / period)}%{opacity:.45}${sec((STEP * 200) / period)}%,100%{opacity:0}}`,
   );
   doc.add(channel(doc, { num: '03', label: 'WHAT RUNS IN PRODUCTION', note: `${count} TOOLS / ${stack.length} LAYERS`, y: 62 }));
 
@@ -336,7 +338,7 @@ function stackPanel() {
         `<path d="${box}" fill="#07120c" stroke="#1d4630"/>`,
         mark,
         doc.text(chip.name, { x: chip.x + 28, y: chip.y + 18.5, size: fs, fill: '#d3eede' }),
-        `<path class="lit" style="animation-delay:${n(k * STEP)}s" d="${box}" fill="${C.t3}" fill-opacity=".18" stroke="${C.t4}"/>`,
+        `<path class="lit" style="animation-delay:${sec(k * STEP)}s" d="${box}" fill="${C.t3}" fill-opacity=".18" stroke="${C.t4}"/>`,
       );
       k++;
     }
@@ -443,7 +445,7 @@ function footer() {
         cells.push({ x, y, ch: RAMP[1 + Math.floor(v * 8)], fill: v > 0.5 ? C.t2 : v > 0.2 ? C.t1 : C.t0 });
       }
     }
-    doc.add(`<g class="n n${k}" style="animation-delay:${k ? n(-(3 - k) * 0.18) : 0}s">${doc.field(cells, { size: 11 })}</g>`);
+    doc.add(`<g class="n n${k}" style="animation-delay:${k ? sec(-(3 - k) * 0.18) : 0}s">${doc.field(cells, { size: 11 })}</g>`);
   }
   doc.add(
     `<g id="eot">${doc.text('END OF TRANSMISSION', { x: W / 2, y: 92, size: 24, font: 'osd', fill: C.white, ls: 3, anchor: 'middle' })}</g>`,

@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import * as icons from 'simple-icons';
-import { Doc, C, FONTS, RAMP, ROOT, rng, clamp, n, channel, write } from './lib.mjs';
+import { Doc, C, RAMP, ROOT, rng, clamp, n, write } from './lib.mjs';
 import { stack, SITE, CONTACT } from './data/profile.mjs';
 
 const W = 880;
@@ -12,7 +12,7 @@ const pad2 = (i) => String(i).padStart(2, '0');
 /* times keep three decimals: rounded to a tenth, the deals of a flicker drift apart and leave holes */
 const sec = (v) => +v.toFixed(3);
 
-/* ══ channel 1: the boot screen ════════════════════════════
+/* ══ the television: the boot screen ═══════════════════════
    The name stands on a mountain of characters: dense under the
    letters, thinning to dashes and then single dots as the slope runs
    out to the edges. The picture itself is still. What moves are a few
@@ -185,12 +185,13 @@ function hero() {
   return doc.render();
 }
 
-/* ══ channel 2: who is on air ═════════════════════════════
-   The introduction, typed out by a terminal. Every letter has its own
-   moment: it is off until the cursor reaches it, then stays lit until
-   the next pass, when a short blank runs ahead of the cursor and the
-   line is typed again. So the first pass writes on an empty screen and
-   every later one reads as the tube refreshing the text. */
+/* ══ the printout ══════════════════════════════════════════
+   The introduction comes off a dot-matrix printer on green-bar paper:
+   tractor holes down both edges, a torn perforation top and bottom.
+   Each line is printed under a strip of paper the colour of its own
+   bar; the strip slides right one letter at a time and the print head
+   rides its edge. When the page is done it holds, then a fresh sheet
+   is fed and printed again. */
 const ABOUT = [
   ['> whoami', "I'm Juan, a full-stack developer in Colombia."],
   ['> cat work.txt', 'I build web products end to end: interfaces, APIs and data, applied AI and deployment.'],
@@ -208,199 +209,312 @@ function wrap(text, max) {
 }
 
 function about() {
-  const left = 56, size = 15.5, lead = 25;
-  const lines = [];
-  for (const [prompt, answer] of ABOUT) {
-    lines.push({ text: prompt, fill: C.label, gap: lines.length ? 12 : 0, pause: 0.35 });
-    for (const line of wrap(answer, 76)) lines.push({ text: line, fill: C.white, gap: 0, pause: 0.12 });
-  }
-  const H = Math.round(118 + lines.length * lead + (ABOUT.length - 1) * 12 + 58);
-  const doc = new Doc(W, H, { title: 'About', desc: ABOUT.map((pair) => pair[1]).join(' '), bulge: 18 });
-  doc.add(channel(doc, { num: '02', label: 'ABOUT', note: 'OPEN TO WORK / REMOTE', y: 62 }));
+  const ROW = 24, STRIP = 34, PAD = 22, size = 15.5;
+  const PAPER = '#e7f3eb', BAR = '#d2e8da', INK = '#10301f', FAINT = '#3d8a61';
+  const rows = [{ text: 'PIMBO.DEV // ABOUT.TXT', fill: FAINT, right: 'OPEN TO WORK / REMOTE', printed: true }, null];
+  ABOUT.forEach(([prompt, answer], i) => {
+    if (i) rows.push(null);
+    rows.push({ text: prompt, fill: FAINT, pause: 0.35 });
+    for (const line of wrap(answer, 76)) rows.push({ text: line, fill: INK, pause: 0.12 });
+  });
+  const H = PAD + rows.length * ROW + PAD;
+  const doc = new Doc(W, H, { title: 'About', desc: ABOUT.map((pair) => pair[1]).join(' '), flat: true });
+  const x0 = STRIP + 24, x1 = W - STRIP - 24;
+  const cw = doc.width('0', { size, font: 'osd' });
+  /* bars two lines deep, the way the paper comes */
+  const band = (k) => (Math.floor(k / 2) % 2 ? BAR : PAPER);
+  const top = (k) => PAD + k * ROW;
 
-  const font = FONTS.osd, s = size / font.unitsPerEm;
-  const DT = 0.03, BLANK = 0.6;
-  let t = 0.6, y = 118, endX = left, endY = y;
-  const byFill = new Map();
-  let cursors = '';
-  for (const line of lines) {
-    y += line.gap;
-    t += line.pause;
-    let x = left;
-    for (const ch of line.text) {
-      const g = doc.gid('osd', ch);
-      if (ch !== ' ') {
-        const [a, b] = doc.warp(x, y);
-        byFill.set(line.fill, (byFill.get(line.fill) ?? '') + '<use class="ty" style="animation-delay:' + n(t * 100) / 100 + 's" href="#' + g.id + '" x="' + Math.round(a / s) + '" y="' + Math.round(b / s) + '"/>');
-      }
-      /* the cursor: a block that sits on each slot for the instant before its letter lands */
-      cursors += '<path class="tc" style="animation-delay:' + n((t - DT) * 100) / 100 + 's" d="' + doc.rect(x, y - size * 0.78, g.adv * s, size * 0.98) + '"/>';
-      x += g.adv * s;
-      t += DT;
-    }
-    endX = x + 6;
-    endY = y;
-    y += lead;
-  }
-  const period = Math.ceil(t + 22);
-  doc.style(
-    '.ty,.tc{visibility:hidden}',
-    '.ty{animation:ty ' + period + 's steps(1) infinite}',
-    '@keyframes ty{0%{visibility:visible}' + n(((period - BLANK) / period) * 100) + '%,100%{visibility:hidden}}',
-    '.tc{animation:tc ' + period + 's steps(1) infinite}',
-    '@keyframes tc{0%{visibility:visible}' + (((DT * 2) / period) * 100).toFixed(3) + '%,100%{visibility:hidden}}',
-    /* with motion turned off the text is simply there */
-    '@media (prefers-reduced-motion: reduce){.ty{visibility:visible}}',
+  /* ── the sheet: torn along the perforation, punched down both edges ── */
+  let edge = 'M0 5';
+  for (let x = 0; x < W; x += 8) edge += `L${x + 4} 0L${Math.min(W, x + 8)} 5`;
+  edge += `L${W} ${H - 5}`;
+  for (let x = W; x > 0; x -= 8) edge += `L${x - 4} ${H}L${Math.max(0, x - 8)} ${H - 5}`;
+  edge += 'z';
+  let holes = '';
+  for (let y = 16; y < H - 8; y += 24) holes += `<circle cx="17" cy="${y}" r="4.6"/><circle cx="${W - 17}" cy="${y}" r="4.6"/>`;
+  const speck = rng(31);
+  let fibre = '';
+  for (let i = 0; i < 90; i++) fibre += `<rect x="${Math.floor(speck() * 120)}" y="${Math.floor(speck() * 120)}" width="${1 + Math.floor(speck() * 3)}" height="1" fill="#2b5a41" opacity="${(0.03 + speck() * 0.06).toFixed(2)}"/>`;
+  doc.def(
+    `<mask id="sheet"><path d="${edge}" fill="#fff"/><g fill="#000">${holes}</g></mask>`,
+    `<pattern id="fb" width="120" height="120" patternUnits="userSpaceOnUse">${fibre}</pattern>`,
+    `<clipPath id="ta"><rect x="${x0 - 2}" y="0" width="${x1 - x0 + 4}" height="${H}"/></clipPath>`,
   );
-  let text = '';
-  for (const [fill, uses] of byFill) text += '<g fill="' + fill + '">' + uses + '</g>';
+  let bars = '';
+  rows.forEach((_, k) => { if (band(k) === BAR) bars += `<rect x="0" y="${top(k)}" width="${W}" height="${ROW}"/>`; });
+
+  /* ── the lines, and the clock they are printed on ── */
+  const DT = 0.03, HOLD = 16, FEED = 1.2;
+  let t = 0.9, text = '', covers = '', keys = '', head = '';
+  const typed = [];
+  rows.forEach((row, k) => {
+    if (!row) return;
+    const y = top(k) + 17;
+    text += doc.text(row.text, { x: x0, y, size, font: 'osd', fill: row.fill });
+    if (row.right) text += doc.text(row.right, { x: x1, y, size: 11, font: 'osd', fill: row.fill, anchor: 'end', ls: 0.8 });
+    if (row.printed) return;
+    t += row.pause;
+    const count = [...row.text].length;
+    typed.push({ k, count, from: t, to: t + count * DT });
+    t += count * DT;
+  });
+  const period = Math.ceil(t + HOLD + FEED);
+  const pc = (time) => +((time / period) * 100).toFixed(3);
+  const reset = pc(period - FEED);
+  typed.forEach((row, i) => {
+    const w = +(row.count * cw).toFixed(2);
+    covers += `<rect class="cv" style="animation-name:cv${i}" x="${x0 - 2}" y="${top(row.k)}" width="${x1 - x0 + 4}" height="${ROW}" fill="${band(row.k)}"/>`;
+    keys += `@keyframes cv${i}{0%,100%{visibility:visible;transform:none}${pc(row.from)}%{transform:none;animation-timing-function:steps(${row.count})}${pc(row.to)}%{transform:translateX(${w}px)}${reset}%{transform:none}}`;
+    const y = top(row.k) - top(typed[0].k);
+    head += `${pc(row.from)}%{transform:translate(0,${y}px);animation-timing-function:steps(${row.count})}${pc(row.to)}%{transform:translate(${w}px,${y}px)}`;
+  });
+  doc.style(
+    /* with motion turned off the strips stay away and the page is simply printed */
+    '.cv,.hd{visibility:hidden}',
+    `.cv{animation-duration:${period}s;animation-timing-function:steps(1);animation-iteration-count:infinite}`,
+    keys,
+    `.hd{animation:hd ${period}s steps(1) infinite}`,
+    `@keyframes hd{0%,100%{visibility:visible;transform:none}${head}${reset}%{transform:none}}`,
+  );
   doc.add(
-    '<g id="say" transform="scale(' + +s.toFixed(5) + ')">' + text + '</g>',
-    '<use href="#say" filter="url(#haze)" opacity=".55"/>',
-    '<g fill="' + C.t3 + '">' + cursors + '</g>',
-    /* typing done: the cursor rests after the last word */
-    '<path class="ty" style="animation-delay:' + n(t * 100) / 100 + 's" d="' + doc.rect(endX, endY - size * 0.78, 9, size * 0.98) + '" fill="' + C.t3 + '"/>',
+    '<g mask="url(#sheet)">',
+    `<rect width="${W}" height="${H}" fill="${PAPER}"/>`,
+    `<g fill="${BAR}">${bars}</g>`,
+    `<rect width="${W}" height="${H}" fill="url(#fb)"/>`,
+    `<path d="M${STRIP} 0V${H}M${W - STRIP} 0V${H}" stroke="#9cbfab" stroke-dasharray="2 4" fill="none"/>`,
+    text,
+    `<g clip-path="url(#ta)">${covers}<rect class="hd" x="${x0}" y="${top(typed[0].k) + 4}" width="${n(cw)}" height="16" fill="${INK}"/></g>`,
+    '</g>',
+    `<path d="${edge}" fill="none" stroke="#a9c7b6"/>`,
   );
   return doc.render();
 }
 
-/* ══ channel 3: the stack ══════════════════════════════════
-   Layers of labelled keys. A check runs across the keys one at a
-   time, the way an old machine counts its memory. */
+/* ── hardware shared by the rack and the analyzer ── */
+function screw(x, y, turn) {
+  const a = (turn * Math.PI) / 180, dx = Math.cos(a) * 3, dy = Math.sin(a) * 3;
+  return `<circle cx="${x}" cy="${y}" r="4.2" fill="#0a0c0b" stroke="#353d39"/><path d="M${n(x - dx)} ${n(y - dy)}L${n(x + dx)} ${n(y + dy)}" stroke="#3d4642" stroke-width="1.2"/>`;
+}
+const PLATE = '<linearGradient id="pn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#181c1a"/><stop offset="1" stop-color="#0e1110"/></linearGradient>';
+const BLUR = '<filter id="haze" x="-10%" y="-30%" width="120%" height="160%"><feGaussianBlur stdDeviation="2.4"/></filter>';
+const led = (x, y, cls = '') => `<circle cx="${x}" cy="${y}" r="7" fill="${C.t3}" opacity=".22" filter="url(#haze)"/><circle${cls} cx="${x}" cy="${y}" r="3" fill="${C.t3}"/>`;
+
+/* ══ the rack ══════════════════════════════════════════════
+   The stack is a rack of modules, one per layer, each a row of
+   backlit keys. A check runs across the keys one at a time, the way
+   an old machine counts its memory. */
 function stackPanel() {
   const count = stack.reduce((sum, g) => sum + g.tools.length, 0);
-  const chipH = 28, gap = 6, fs = 12;
-  const left = 54, chipsX = 240, maxX = W - 54;
-
-  /* laid out once to know how tall the glass is, then drawn */
-  const layout = (doc) => {
-    let y = 106;
-    const groups = stack.map((group) => {
-      const top = y;
-      let x = chipsX, rowY = y;
-      const chips = group.tools.map(([name, slug]) => {
-        const w = Math.ceil(8 + 13 + 7 + doc.width(name, { size: fs }) + 10);
-        if (x + w > maxX) { x = chipsX; rowY += chipH + gap; }
-        const chip = { name, slug, x, y: rowY, w };
-        x += w + gap;
-        return chip;
-      });
-      y = Math.max(rowY + chipH, top + 50) + 30;
-      return { ...group, top, chips };
-    });
-    return { groups, height: y + 14 };
-  };
-  const probe = new Doc(W, 400, { title: '', desc: '' });
-  const { height } = layout(probe);
-
-  const doc = new Doc(W, height, {
+  const RAIL = 24, HEAD = 56, GAP = 3, keyH = 28, gap = 6, fs = 12;
+  const left = 54, keysX = 246, maxX = W - 50;
+  const doc = new Doc(W, 100, {
     title: 'What runs in production',
     desc: stack.map((g) => `${g.title} ${g.note}: ${g.tools.map((t) => t[0]).join(', ')}.`).join(' '),
-    bulge: 20,
+    flat: true,
   });
-  const { groups } = layout(doc);
+
+  let y = 6 + HEAD + GAP;
+  const modules = stack.map((group) => {
+    const top = y;
+    let x = keysX, rowY = top + 17;
+    const keys = group.tools.map(([name, slug]) => {
+      const w = Math.ceil(8 + 13 + 7 + doc.width(name, { size: fs }) + 10);
+      if (x + w > maxX) { x = keysX; rowY += keyH + gap; }
+      const key = { name, slug, x, y: rowY, w };
+      x += w + gap;
+      return key;
+    });
+    const height = Math.max(rowY + keyH + 17 - top, 82);
+    y += height + GAP;
+    return { ...group, top, height, keys };
+  });
+  const H = y + 3;
+  doc.h = H;
+
   const STEP = 0.16, period = sec(count * STEP + 2.4);
   doc.style(
     `.lit{opacity:0;animation:lit ${period}s steps(1) infinite}`,
     `@keyframes lit{0%{opacity:1}${sec((STEP * 100) / period)}%{opacity:.45}${sec((STEP * 200) / period)}%,100%{opacity:0}}`,
+    '.pw{animation:pw 3.2s steps(1) infinite}@keyframes pw{92%{opacity:.35}}',
   );
-  doc.add(channel(doc, { num: '03', label: 'WHAT RUNS IN PRODUCTION', note: `${count} TOOLS / ${stack.length} LAYERS`, y: 62 }));
+  doc.def(PLATE, BLUR);
+  const turn = rng(8);
+  const panel = (py, ph) => [
+    `<rect x="${RAIL}" y="${py}" width="${W - RAIL * 2}" height="${ph}" rx="3" fill="url(#pn)"/>`,
+    `<rect x="${RAIL + 2}" y="${py}" width="${W - RAIL * 2 - 4}" height="1" fill="#2f3733"/>`,
+    screw(RAIL + 12, py + 12, turn() * 180), screw(W - RAIL - 12, py + 12, turn() * 180),
+    screw(RAIL + 12, py + ph - 12, turn() * 180), screw(W - RAIL - 12, py + ph - 12, turn() * 180),
+  ].join('');
+
+  /* ── the frame and its rails ── */
+  let slots = '';
+  for (let sy = 14; sy < H - 10; sy += 22) slots += `<rect x="8" y="${sy}" width="8" height="5" rx="2.5"/><rect x="${W - 16}" y="${sy}" width="8" height="5" rx="2.5"/>`;
+  doc.add(
+    `<rect x=".5" y=".5" width="${W - 1}" height="${H - 1}" rx="12" fill="#060807" stroke="#262d29"/>`,
+    `<g fill="#000" stroke="#1d2421">${slots}</g>`,
+  );
+
+  /* ── the top unit: what this rack is ── */
+  const tag = 'STACK';
+  const tw = doc.width(tag, { size: 19, font: 'osd', ls: 1.5 });
+  doc.add(
+    panel(6, HEAD),
+    led(left + 3, 6 + HEAD / 2, ' class="pw"'),
+    doc.text(tag, { x: left + 18, y: 6 + HEAD / 2 + 7, size: 19, font: 'osd', fill: C.t3, ls: 1.5 }),
+    doc.text('WHAT RUNS IN PRODUCTION', { x: left + 18 + tw + 18, y: 6 + HEAD / 2 + 5, size: 13, font: 'osd', fill: C.t4, ls: 1.4 }),
+    doc.text(`${count} TOOLS / ${stack.length} LAYERS`, { x: maxX, y: 6 + HEAD / 2 + 5, size: 11, font: 'osd', fill: C.label, ls: 0.8, anchor: 'end' }),
+  );
 
   let k = 0;
   const seen = new Set();
-  groups.forEach((group, gi) => {
-    const y = group.top;
-    if (gi) doc.add(`<path d="${doc.line(left, y - 15, maxX, y - 15)}" stroke="${C.t0}" stroke-opacity=".8" fill="none"/>`);
+  for (const mod of modules) {
+    const { top } = mod;
+    let bar = '', dark = '';
+    for (let i = 0; i < 16; i++) {
+      const seg = `<rect x="${left + i * 7}" y="${top + 55}" width="5" height="7"/>`;
+      if (i < mod.tools.length) bar += seg; else dark += seg;
+    }
     doc.add(
-      doc.text(group.title, { x: left, y: y + 13, size: 13, font: 'osd', fill: C.t4, ls: 1 }),
-      doc.text(group.note, { x: left, y: y + 30, size: 10.5, font: 'mono', fill: C.soft }),
+      panel(top, mod.height),
+      doc.text(mod.title, { x: left, y: top + 29, size: 13, font: 'osd', fill: C.t4, ls: 1 }),
+      doc.text(mod.note, { x: left, y: top + 45, size: 10.5, font: 'mono', fill: C.soft }),
+      `<g fill="#16271d">${dark}</g><g fill="${C.t2}">${bar}</g>`,
+      doc.text(pad2(mod.tools.length), { x: left + 16 * 7 + 5, y: top + 62.5, size: 10, font: 'osd', fill: C.label }),
     );
-    let pips = '';
-    group.tools.forEach((_, i) => { pips += doc.rect(left + i * 7, y + 40, 4, 7); });
-    doc.add(
-      `<path d="${pips}" fill="${C.t2}"/>`,
-      doc.text(pad2(group.tools.length), { x: left + group.tools.length * 7 + 6, y: y + 47.5, size: 10, font: 'osd', fill: C.label }),
-    );
-    for (const chip of group.chips) {
-      const box = doc.rect(chip.x + 0.5, chip.y + 0.5, chip.w - 1, chipH - 1);
-      const [ix, iy] = doc.warp(chip.x + 8, chip.y + 7.5);
+    for (const key of mod.keys) {
       let mark;
-      if (chip.slug) {
-        const icon = icons[`si${chip.slug[0].toUpperCase()}${chip.slug.slice(1)}`];
-        if (!icon) throw new Error(`Simple Icons has no "${chip.slug}"`);
-        if (!seen.has(chip.slug)) { seen.add(chip.slug); doc.def(`<path id="i-${chip.slug}" d="${icon.path}"/>`); }
-        mark = `<use href="#i-${chip.slug}" transform="translate(${n(ix)} ${n(iy)}) scale(.5417)" fill="${C.t3}"/>`;
+      if (key.slug) {
+        const icon = icons[`si${key.slug[0].toUpperCase()}${key.slug.slice(1)}`];
+        if (!icon) throw new Error(`Simple Icons has no "${key.slug}"`);
+        if (!seen.has(key.slug)) { seen.add(key.slug); doc.def(`<path id="i-${key.slug}" d="${icon.path}"/>`); }
+        mark = `<use href="#i-${key.slug}" transform="translate(${key.x + 8} ${key.y + 7.5}) scale(.5417)" fill="${C.t3}"/>`;
       } else {
         /* no logo to borrow: a plain marker */
-        mark = `<path d="M${n(ix + 6.5)} ${n(iy + 1.5)}l5 5l-5 5l-5 -5z" fill="none" stroke="${C.t3}" stroke-width="1.4"/>`;
+        mark = `<path d="M${key.x + 14.5} ${key.y + 9}l5 5l-5 5l-5 -5z" fill="none" stroke="${C.t3}" stroke-width="1.4"/>`;
       }
       doc.add(
-        `<path d="${box}" fill="#07120c" stroke="#1d4630"/>`,
+        `<rect x="${key.x + 0.5}" y="${key.y + 0.5}" width="${key.w - 1}" height="${keyH - 1}" rx="4" fill="#08100c" stroke="#1f3d2d"/>`,
+        `<rect x="${key.x + 3}" y="${key.y + 1.5}" width="${key.w - 6}" height="1" fill="#3a6a50" opacity=".45"/>`,
         mark,
-        doc.text(chip.name, { x: chip.x + 28, y: chip.y + 18.5, size: fs, fill: '#d3eede' }),
-        `<path class="lit" style="animation-delay:${sec(k * STEP)}s" d="${box}" fill="${C.t3}" fill-opacity=".18" stroke="${C.t4}"/>`,
+        doc.text(key.name, { x: key.x + 28, y: key.y + 18.5, size: fs, fill: '#d3eede' }),
+        `<rect class="lit" style="animation-delay:${sec(k * STEP)}s" x="${key.x + 0.5}" y="${key.y + 0.5}" width="${key.w - 1}" height="${keyH - 1}" rx="4" fill="${C.t3}" fill-opacity=".2" stroke="${C.t4}"/>`,
       );
       k++;
     }
-  });
+  }
   return doc.render();
 }
 
-/* ══ channel 4: the signal ═════════════════════════════════
-   A year of contributions, one character per day: the busier the day,
-   the denser the glyph. A playhead walks the weeks. */
+/* ══ the analyzer ══════════════════════════════════════════
+   A year of contributions on a spectrum analyzer: one band per week,
+   green up to amber up to red, with the totals on seven-segment
+   readouts underneath. Only the top light of each band flickers. */
+const SEGMENTS = { 0: 'abcdef', 1: 'bc', 2: 'abged', 3: 'abgcd', 4: 'fgbc', 5: 'afgcd', 6: 'afgedc', 7: 'abc', 8: 'abcdefg', 9: 'abfgcd' };
+function sevenSeg(value, x, y) {
+  const w = 15, h = 28, t = 3.2, half = h / 2;
+  const shape = {
+    a: [2.5, 0, w - 5, t], d: [2.5, h - t, w - 5, t], g: [2.5, half - t / 2, w - 5, t],
+    f: [0, 2.5, t, half - 4], b: [w - t, 2.5, t, half - 4], e: [0, half + 1.5, t, half - 4], c: [w - t, half + 1.5, t, half - 4],
+  };
+  let on = '', off = '';
+  [...String(value)].forEach((digit, i) => {
+    for (const [name, [sx, sy, sw, sh]] of Object.entries(shape)) {
+      const r = `<rect x="${n(x + i * 21 + sx)}" y="${n(y + sy)}" width="${n(sw)}" height="${n(sh)}" rx="1"/>`;
+      if (SEGMENTS[digit].includes(name)) on += r; else off += r;
+    }
+  });
+  return { on, off, width: String(value).length * 21 - 6 };
+}
+
 function signal(contrib) {
-  const H = 322;
+  const H = 332, ROWS = 12;
   const days = contrib.weeks.flat();
-  const total = contrib.total.toLocaleString('en-US');
   let longest = 0, run = 0;
   for (const d of days) { run = d.count ? run + 1 : 0; longest = Math.max(longest, run); }
   const active = days.filter((d) => d.count).length;
   const best = Math.max(...days.map((d) => d.count));
   const doc = new Doc(W, H, {
     title: 'Signal',
-    desc: `${total} contributions in the last 12 months. Longest streak ${longest} days, ${active} active days, ${best} on the busiest day.`,
-    bulge: 18,
+    desc: `${contrib.total.toLocaleString('en-US')} contributions in the last 12 months. Longest streak ${longest} days, ${active} active days, ${best} on the busiest day.`,
+    flat: true,
   });
-  doc.add(channel(doc, { num: '04', label: 'SIGNAL', note: 'LAST 12 MONTHS', y: 62 }));
+  const AMBER = '#ffc247';
+  doc.def(PLATE, BLUR, '<linearGradient id="gs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".07"/><stop offset=".4" stop-color="#fff" stop-opacity="0"/></linearGradient>');
+  doc.style(
+    '.pw{animation:pw 3.2s steps(1) infinite}@keyframes pw{92%{opacity:.35}}',
+    /* the top lights flicker in four groups, each on its own clock */
+    ...[0.9, 1.3, 1.7, 2.3].map((p, i) => `.pk${i}{animation:pk ${p}s steps(1) ${sec(-i * 0.37)}s infinite}`),
+    '@keyframes pk{62%{opacity:.3}}',
+  );
 
-  const left = 54, gx = 112, gy = 130, px = 13.5, py = 15.5;
-  /* GitHub's own levels are quartiles of the busiest day, and one huge day flattens the rest.
-     Rank among the active days instead: each fifth of them gets its own glyph. */
-  const ranked = days.filter((d) => d.count).map((d) => d.count).sort((a, b) => a - b);
-  const level = (count) => (count ? 1 + Math.min(4, Math.floor((ranked.findIndex((c) => c >= count) / ranked.length) * 5)) : 0);
-  const GLYPH = ['·', ':', '=', '+', '#', '@'];
-  const INK = [C.t0, C.t1, C.t2, C.t2, C.t3, C.t4];
+  /* ── the faceplate ── */
+  doc.add(
+    `<rect x=".5" y=".5" width="${W - 1}" height="${H - 1}" rx="12" fill="url(#pn)" stroke="#262d29"/>`,
+    `<rect x="12" y="1" width="${W - 24}" height="1" fill="#333b37"/>`,
+    screw(15, 15, 30), screw(W - 15, 15, 110), screw(15, H - 15, 75), screw(W - 15, H - 15, 150),
+    led(41, 33, ' class="pw"'),
+    doc.text('SIGNAL', { x: 56, y: 40, size: 19, font: 'osd', fill: C.t3, ls: 1.5 }),
+    doc.text('CONTRIBUTIONS PER WEEK', { x: 56 + doc.width('SIGNAL', { size: 19, font: 'osd', ls: 1.5 }) + 18, y: 38, size: 13, font: 'osd', fill: C.t4, ls: 1.4 }),
+    doc.text('LAST 12 MONTHS', { x: W - 38, y: 38, size: 11, font: 'osd', fill: C.label, ls: 0.8, anchor: 'end' }),
+  );
+
+  /* ── the display ── */
+  const wx = 30, wy = 56, ww = W - 60, wh = 176;
+  const weeks = contrib.weeks.map((week) => week.reduce((sum, d) => sum + d.count, 0));
+  const peak = Math.max(...weeks);
+  const pitch = 15, segW = 10, segH = 9, rowPitch = 12;
+  const gx = wx + (ww - (weeks.length * pitch - (pitch - segW))) / 2;
+  const base = wy + wh - 16;
+  const ink = (row) => (row >= ROWS - 2 ? C.red : row >= ROWS - 4 ? AMBER : row >= 5 ? C.t3 : C.t2);
+  const lit = new Map(), tops = ['', '', '', ''];
+  let dark = '';
+  const pick = rng(53);
+  weeks.forEach((total, w) => {
+    /* one busy week would flatten the rest, so the scale is compressed */
+    const level = total ? clamp(Math.ceil(ROWS * Math.pow(total / peak, 0.55)), 1, ROWS) : 0;
+    for (let row = 0; row < ROWS; row++) {
+      const r = `<rect x="${n(gx + w * pitch)}" y="${base - segH - row * rowPitch}" width="${segW}" height="${segH}" rx="1.5" fill="${ink(row)}"/>`;
+      if (row >= level) dark += r;
+      else if (row === level - 1) tops[Math.floor(pick() * 4)] += r;
+      else lit.set(ink(row), (lit.get(ink(row)) ?? '') + r);
+    }
+  });
+  doc.add(
+    `<rect x="${wx}" y="${wy}" width="${ww}" height="${wh}" rx="7" fill="#020403" stroke="#000" stroke-width="2"/>`,
+    `<rect x="${wx - 1.5}" y="${wy - 1.5}" width="${ww + 3}" height="${wh + 3}" rx="8.5" fill="none" stroke="#2c3430"/>`,
+    `<g opacity=".1">${dark}</g>`,
+    `<g id="bars">${[...lit.values()].join('')}${tops.map((t, i) => `<g class="pk${i}">${t}</g>`).join('')}</g>`,
+    '<use href="#bars" filter="url(#haze)" opacity=".55"/>',
+    `<rect x="${wx}" y="${wy}" width="${ww}" height="${wh}" rx="7" fill="url(#gs)"/>`,
+  );
   const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-  const cells = [];
   let lastMonth = -1, lastLabel = -9;
   contrib.weeks.forEach((week, w) => {
     const month = new Date(`${week[0].date}T00:00:00Z`).getUTCMonth();
     if (month !== lastMonth && w - lastLabel > 2 && w < contrib.weeks.length - 1) {
-      doc.add(doc.text(MONTHS[month], { x: gx + w * px - 5, y: gy - 22, size: 9.5, font: 'osd', fill: C.label, ls: 0.6 }));
+      doc.add(doc.text(MONTHS[month], { x: gx + w * pitch, y: base + 11, size: 8.5, font: 'osd', fill: C.label, ls: 0.6 }));
       lastLabel = w;
     }
     lastMonth = month;
-    for (const d of week) {
-      const row = new Date(`${d.date}T00:00:00Z`).getUTCDay();
-      cells.push({ x: gx + w * px, y: gy + row * py, ch: GLYPH[level(d.count)], fill: INK[level(d.count)] });
-    }
   });
-  ['MON', 'WED', 'FRI'].forEach((label, i) => doc.add(doc.text(label, { x: left, y: gy + (1 + i * 2) * py - 1, size: 9.5, font: 'osd', fill: C.label, ls: 0.6 })));
-  doc.add(`<g id="sig">${doc.field(cells, { size: 12.5 })}</g>`, '<use href="#sig" filter="url(#haze)" opacity=".6"/>');
 
-  const weeks = contrib.weeks.length;
-  doc.style(`.ph{animation:ph ${n(weeks * 0.2)}s steps(${weeks}) infinite}@keyframes ph{to{transform:translateX(${n(weeks * px)}px)}}`);
-  doc.add(`<g class="ph"><rect x="${n(gx - px / 2)}" y="${gy - 14}" width="${px}" height="${n(7 * py + 3)}" fill="${C.t3}" opacity=".16"/><rect x="${n(gx - px / 2)}" y="${gy - 17}" width="${px}" height="2" fill="${C.t4}"/></g>`);
-
-  const stats = [[total, 'CONTRIBUTIONS'], [`${longest} D`, 'LONGEST STREAK'], [`${active}/${days.length}`, 'ACTIVE DAYS'], [String(best), 'BUSIEST DAY']];
+  /* ── the readouts ── */
+  const stats = [[contrib.total, 'CONTRIBUTIONS'], [longest, 'DAY STREAK'], [active, 'ACTIVE DAYS'], [best, 'BUSIEST DAY']];
+  let on = '', off = '';
   stats.forEach(([value, label], i) => {
-    const x = left + i * 200;
+    const x = 30 + i * 212, y = 252;
+    const seg = sevenSeg(value, x + 11, y + 10);
+    on += seg.on;
+    off += seg.off;
     doc.add(
-      doc.text(value, { x, y: gy + 134, size: 22, font: 'osd', fill: C.t4 }),
-      doc.text(label, { x, y: gy + 150, size: 9.5, font: 'osd', fill: C.label, ls: 0.8 }),
+      `<rect x="${x}" y="${y}" width="${seg.width + 22}" height="48" rx="5" fill="#020403" stroke="#2c3430"/>`,
+      doc.text(label, { x: x + seg.width + 32, y: y + 28, size: 9.5, font: 'osd', fill: C.label, ls: 0.8 }),
     );
   });
+  doc.add(
+    `<g fill="#0d2217">${off}</g><g id="num" fill="${C.t3}">${on}</g><use href="#num" filter="url(#haze)" opacity=".6"/>`,
+  );
   return doc.render();
 }
 
@@ -423,34 +537,42 @@ function button(label, primary) {
   return doc.render();
 }
 
-/* ══ sign-off ══════════════════════════════════════════════
-   The station has gone off the air: snow, dealt three ways and cycled. */
+/* ══ sign-off: the test card ═══════════════════════════════
+   What a station leaves on screen when it goes off the air, set in
+   characters: eight bars, each filled with one glyph of the ramp,
+   densest to faintest. A bright row runs down it. */
 function footer() {
-  const H = 176;
-  const doc = new Doc(W, H, { title: 'End of transmission', desc: 'End of transmission. More at pimbo.dev. Made in Colombia.', bulge: 16 });
-  const cw = 8.2, ch = 11.6, cols = Math.floor(doc.sw / cw), rows = Math.ceil(doc.sh / ch);
-  const ox = doc.sx + (doc.sw - cols * cw) / 2;
-  const r = rng(77);
-  doc.style(
-    '.n{visibility:hidden}.n0{visibility:visible}',
-    '.n{animation:sn .54s steps(1) infinite}@keyframes sn{0%{visibility:visible}33.3%,100%{visibility:hidden}}',
-  );
-  for (let k = 0; k < 3; k++) {
-    const cells = [];
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < cols; col++) {
-        const x = ox + (col + 0.5) * cw, y = doc.sy + (row + 0.8) * ch;
-        if (r() > 0.55 || (Math.abs(x - W / 2) < 216 && y > 52 && y < 126)) continue;
-        const v = r() * r();
-        cells.push({ x, y, ch: RAMP[1 + Math.floor(v * 8)], fill: v > 0.5 ? C.t2 : v > 0.2 ? C.t1 : C.t0 });
-      }
+  const H = 150, BARS = 8;
+  const doc = new Doc(W, H, { title: 'End of transmission', desc: 'End of transmission. More at pimbo.dev. Made in Colombia.', flat: true });
+  const cw = 8.2, ch = 11.6, size = 11;
+  const cols = Math.floor((W - 28) / cw), rows = Math.floor((H - 22) / ch);
+  const ox = (W - cols * cw) / 2, oy = (H - rows * ch) / 2;
+  const INK = [C.t4, C.t3, C.t3, C.t2, C.t2, C.t1, C.t1, C.t0];
+  const still = [], pulse = Array.from({ length: rows }, () => []);
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const x = ox + (col + 0.5) * cw, y = oy + (row + 0.8) * ch;
+      if (Math.abs(x - W / 2) < 214 && row >= 3 && row < rows - 3) continue;
+      const bar = Math.min(BARS - 1, Math.floor((col / cols) * BARS));
+      still.push({ x, y, ch: RAMP[9 - bar], fill: INK[bar] });
+      pulse[row].push({ x, y, ch: RAMP[9 - bar], fill: C.white });
     }
-    doc.add(`<g class="n n${k}" style="animation-delay:${k ? sec(-(3 - k) * 0.18) : 0}s">${doc.field(cells, { size: 11 })}</g>`);
   }
+  const FALL = 0.09, period = sec(rows * FALL + 4.5);
+  doc.def(BLUR);
+  doc.style(
+    `.p{opacity:0;animation:pu ${period}s steps(1) infinite}`,
+    `@keyframes pu{0%{opacity:.9}${sec((FALL * 100) / period)}%{opacity:.35}${sec((FALL * 200) / period)}%,100%{opacity:0}}`,
+  );
   doc.add(
-    `<g id="eot">${doc.text('END OF TRANSMISSION', { x: W / 2, y: 92, size: 24, font: 'osd', fill: C.white, ls: 3, anchor: 'middle' })}</g>`,
+    `<rect x=".5" y=".5" width="${W - 1}" height="${H - 1}" rx="12" fill="#040706" stroke="#262d29"/>`,
+    doc.field(still, { size }),
+  );
+  pulse.forEach((cells, row) => doc.add(`<g class="p" style="animation-delay:${sec(row * FALL)}s">${doc.field(cells, { size })}</g>`));
+  doc.add(
+    `<g id="eot">${doc.text('END OF TRANSMISSION', { x: W / 2, y: H / 2 + 2, size: 24, font: 'osd', fill: C.white, ls: 3, anchor: 'middle' })}</g>`,
     '<use href="#eot" filter="url(#haze)" opacity=".8"/>',
-    doc.text('MORE AT PIMBO.DEV  /  MADE IN COLOMBIA', { x: W / 2, y: 116, size: 10.5, font: 'osd', fill: C.t3, ls: 1.2, anchor: 'middle' }),
+    doc.text('MORE AT PIMBO.DEV  /  MADE IN COLOMBIA', { x: W / 2, y: H / 2 + 26, size: 10.5, font: 'osd', fill: C.t3, ls: 1.2, anchor: 'middle' }),
   );
   return doc.render();
 }

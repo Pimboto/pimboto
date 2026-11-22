@@ -3,8 +3,8 @@
 // So every letter is drawn as an outline taken from the font files at build time,
 // and every animation is plain CSS inside the SVG.
 //
-// Each panel is the tube of an old television. The glass bulges, so nothing is
-// drawn where it was laid out: every point goes through `warp` first, which pulls
+// A Doc is either a flat plate or the tube of an old television. On the tube the
+// glass bulges, so nothing is drawn where it was laid out: every point goes through `warp` first, which pulls
 // the picture in toward the corners the way a curved screen does. Text rows bow,
 // straight rules become arcs, and the scanlines curve with them.
 //
@@ -304,23 +304,6 @@ function snow() {
     out += `<rect x="${Math.floor(r() * 160)}" y="${Math.floor(r() * 160)}" width="${big ? 2 : 1}" height="1" fill="#dfffee" opacity="${(0.05 + r() * r() * 0.3).toFixed(2)}"/>`;
   }
   return out;
-}
-
-/* the corner label every screen carries: a channel number, a name, a note on the right */
-export function channel(doc, { num, label, note, y = 58 }) {
-  const x = doc.sx + 40, right = doc.sx + doc.sw - 40;
-  const tag = `CH ${num}`;
-  const tw = doc.width(tag, { size: 19, font: 'osd', ls: 1.5 });
-  const lw = doc.width(label, { size: 13, font: 'osd', ls: 1.4 });
-  const out = [
-    doc.text(tag, { x, y, size: 19, font: 'osd', fill: C.t3, ls: 1.5 }),
-    doc.text(label, { x: x + tw + 18, y: y - 2, size: 13, font: 'osd', fill: C.t4, ls: 1.4 }),
-    `<path class="cur" d="${doc.rect(x + tw + 18 + lw + 8, y - 13, 8, 13)}" fill="${C.t3}"/>`,
-    `<path d="${doc.line(x, y + 17, right, y + 17)}" stroke="${C.t1}" stroke-opacity=".5" fill="none"/>`,
-  ];
-  if (note) out.push(doc.text(note, { x: right, y: y - 2, size: 11, font: 'osd', fill: C.label, anchor: 'end', ls: 0.8 }));
-  doc.style('.cur{animation:cur 1.1s steps(1) infinite}', '@keyframes cur{50%{opacity:0}}');
-  return out.join('\n');
 }
 
 export const write = (name, svg) => {
